@@ -9,7 +9,6 @@ use crate::Error;
 pub trait Text: Clone {
     type TextLayoutBuilder: TextLayoutBuilder<Out = Self::TextLayout>;
     type TextLayout: TextLayout;
-
     /// Query the platform for a font with a given name, and return a [`FontFamily`]
     /// object corresponding to that font, if it is found.
     ///
@@ -28,6 +27,11 @@ pub trait Text: Clone {
     ///
     /// [`FontFamily`]: struct.FontFamily.html
     fn font_family(&mut self, family_name: &str) -> Option<FontFamily>;
+
+    #[allow(unused_variables)]
+    fn load_font(&mut self, data: &[u8]) -> Result<FontFamily, Error> {
+        Err(Error::NotSupported)
+    }
 
     /// Create a new layout object to display the provided `text`.
     ///

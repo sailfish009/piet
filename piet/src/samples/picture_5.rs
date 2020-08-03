@@ -16,13 +16,20 @@ const BLUE: Color = Color::rgb8(0, 0, 255);
 pub fn draw<R: RenderContext>(rc: &mut R) -> Result<(), Error> {
     rc.clear(Color::WHITE);
     let text = rc.text();
-    let courier = text
-        .font_family("Courier New")
-        .unwrap_or(FontFamily::MONOSPACE);
+    //let _ = text
+    //.load_font(include_bytes!("../../../resources/Anaheim-Regular.ttf"))
+    //.unwrap();
+    //let font = text
+    //.load_font(include_bytes!("../../../resources/Anaheim-Bold.ttf"))
+    //.unwrap();
+    //let font2 = text.font_family("Alfa Slab One").unwrap();
+
+    let font = FontFamily::SYSTEM_UI;
+    let font2 = text.font_family("Courier New").unwrap();
     let layout = text
         .new_text_layout(TEXT)
         .max_width(200.0)
-        .default_attribute(courier)
+        .default_attribute(font2)
         .default_attribute(TextAttribute::Underline(true))
         .default_attribute(TextAttribute::Italic(true))
         .default_attribute(TextAttribute::ForegroundColor(RED))
@@ -32,7 +39,8 @@ pub fn draw<R: RenderContext>(rc: &mut R) -> Result<(), Error> {
         .range_attribute(40..300, TextAttribute::Underline(false))
         .range_attribute(60..160, TextAttribute::Italic(false))
         .range_attribute(140..220, FontWeight::NORMAL)
-        .range_attribute(240.., FontFamily::SYSTEM_UI)
+        .range_attribute(200.., font)
+        .range_attribute(240..260, TextAttribute::Italic(true))
         .build()?;
 
     let y_pos = ((SIZE.height - layout.size().height * 2.0) / 4.0).max(0.0);
