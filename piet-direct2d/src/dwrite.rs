@@ -32,6 +32,7 @@ use wio::wide::{FromWide, ToWide};
 use piet::kurbo::Insets;
 use piet::{FontFamily as PietFontFamily, FontWeight, TextAlignment};
 
+use super::font_loading::PietFontCollectionLoader;
 use crate::Brush;
 
 /// "en-US" as null-terminated utf16.
@@ -138,6 +139,22 @@ impl DwriteFactory {
             let mut ptr = null_mut();
             let hr = self.0.GetSystemFontCollection(&mut ptr, 0);
             wrap(hr, ptr, FontCollection)
+        }
+    }
+
+    pub(crate) fn register_font_collection_loader(
+        &self,
+        loader: &mut PietFontCollectionLoader,
+    ) -> Result<(), Error> {
+        unsafe {
+            let hr = self
+                .0
+                .RegisterFontCollectionLoader(loader as *mut _ as *mut _);
+            if SUCCEEDED(hr) {
+                Ok(())
+            } else {
+                Err(hr.into())
+            }
         }
     }
 

@@ -9,7 +9,7 @@ mod conv;
 pub mod d2d;
 pub mod d3d;
 pub mod dwrite;
-mod font_loading;
+pub mod font_loading;
 mod text;
 
 use std::borrow::Cow;

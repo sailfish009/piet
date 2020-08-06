@@ -4,6 +4,7 @@ mod lines;
 
 use std::convert::TryInto;
 use std::ops::{Range, RangeBounds};
+use std::rc::Rc;
 
 pub use d2d::{D2DDevice, D2DFactory, DeviceContext as D2DDeviceContext};
 pub use dwrite::DwriteFactory;
@@ -19,11 +20,13 @@ use piet::{
 use crate::conv;
 use crate::d2d;
 use crate::dwrite::{self, TextFormat};
+use crate::font_loading::PietFontCollectionLoader;
 
 #[derive(Clone)]
 pub struct D2DText {
     dwrite: DwriteFactory,
     device: d2d::DeviceContext,
+    font_loader: Rc<PietFontCollectionLoader>,
 }
 
 #[derive(Clone)]
@@ -48,7 +51,13 @@ impl D2DText {
     /// Create a new factory that satisfies the piet `Text` trait given
     /// the (platform-specific) dwrite factory.
     pub fn new(dwrite: DwriteFactory, device: d2d::DeviceContext) -> D2DText {
-        D2DText { dwrite, device }
+        let mut font_loader = Rc::new(PietFontCollectionLoader::default());
+        dwrite.register_font_collection_loader(&mut font_loader);
+        D2DText {
+            dwrite,
+            device,
+            font_loader,
+        }
     }
 
     #[cfg(test)]
@@ -61,7 +70,7 @@ impl D2DText {
         // Create the D2D Device and Context
         let mut device = unsafe { d2d.create_device(d3d.as_dxgi().unwrap().as_raw()).unwrap() };
         let device = device.create_device_context().unwrap();
-        D2DText { dwrite, device }
+        D2DText::new(dwrite, device)
     }
 }
 

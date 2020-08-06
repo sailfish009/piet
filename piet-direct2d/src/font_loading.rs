@@ -28,8 +28,12 @@ type FontData = Rc<[u8]>;
 macro_rules! get_interface {
     ($item:expr, $interface:ty) => {{
         let mut ppv: Option<$interface> = None;
+        let item = Box::new($item);
+        item.add_ref();
         let iid = &<$interface as com::Interface>::IID as *const _;
-        let hr = $item.query_interface(iid, &mut ppv as *mut _ as *mut *mut c_void);
+        let hr = item.query_interface(iid, &mut ppv as *mut _ as *mut *mut c_void);
+        item.release();
+        Box::into_raw(item);
         if SUCCEEDED(hr) {
             ppv
         } else {
